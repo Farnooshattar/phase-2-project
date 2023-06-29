@@ -3,16 +3,20 @@ import CatCollection from "../CatCollection";
 import CatAddForm from "../CatAddForm";
 import CatSearch from "../CatSearch";
 import { Link } from "react-router-dom";
-import { Container } from "semantic-ui-react";
+import { Container, Dimmer, Loader } from "semantic-ui-react";
 
 function CatPage() {
   const [collection, setCollection] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Fetch cat collection data from the server
     fetch("https://cats-json.onrender.com/cats")
       .then((response) => response.json())
-      .then((data) => setCollection(data));
+      .then((data) => {
+        setCollection(data);
+        setIsLoading(false); // Set loading state to false once data is fetched
+      });
   }, []);
 
   function addCat(newCat) {
@@ -48,11 +52,17 @@ function CatPage() {
       <br />
       <br />
       <br />
-      {/* Component for displaying the cat collection */}
-      <CatCollection
-        collection={collection}
-        deleteFromScreen={deleteFromScreen}
-      />
+      {isLoading ? ( // Show loading message if isLoading is true
+        <Dimmer active inverted>
+          <Loader content="Loading..." />
+        </Dimmer>
+      ) : (
+        // Show the cat collection if isLoading is false
+        <CatCollection
+          collection={collection}
+          deleteFromScreen={deleteFromScreen}
+        />
+      )}
     </Container>
   );
 }
